@@ -4,18 +4,18 @@ A structured, modular, and maintainable approach to Federated Learning (FL) usin
 
 ---
 
-## 📖 Table of Contents
-1. [Project Overview](#-project-overview)
-2. [Architectural Structure](#-architectural-structure)
-3. [GoF Design Patterns Catalog](#-gof-design-patterns-catalog)
-4. [File Structure](#-file-structure)
-5. [Experimental Results](#-experimental-results)
-6. [Getting Started & Installation](#-getting-started--installation)
-7. [Running the Experiments](#-running-the-experiments)
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Architectural Structure](#architectural-structure)
+3. [GoF Design Patterns Catalog](#gof-design-patterns-catalog)
+4. [File Structure](#file-structure)
+5. [Experimental Results](#experimental-results)
+6. [Getting Started & Installation](#getting-started--installation)
+7. [Running the Experiments](#running-the-experiments)
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 Standard FL deployments in healthcare suffer from monolithic architectures where training loops, aggregation strategies, privacy accountants, and connection handlers are tightly coupled. This codebase systematically applies **8 Gang of Four (GoF) Design Patterns** to cleanly separate these cross-cutting concerns.
 
@@ -27,7 +27,7 @@ Standard FL deployments in healthcare suffer from monolithic architectures where
 
 ---
 
-## 🏗 Architectural Structure
+## Architectural Structure
 
 The system is decoupled using an event-driven `Mediator` that connects the Server, Clients, Privacy Decorators, and Resilience Observers.
 
@@ -89,7 +89,7 @@ sequenceDiagram
 
 ---
 
-## 🧩 GoF Design Patterns Catalog
+## GoF Design Patterns Catalog
 
 This framework maps classic software engineering patterns directly to FL features and regulatory requirements:
 
@@ -106,7 +106,7 @@ This framework maps classic software engineering patterns directly to FL feature
 
 ---
 
-## 📂 File Structure
+## File Structure
 
 ```text
 fedpatterns-med/
@@ -133,7 +133,7 @@ fedpatterns-med/
 
 ---
 
-## 📊 Experimental Results
+## Experimental Results
 
 Our extensive evaluation on **PneumoniaMNIST** and **ChestMNIST** datasets yields the following canonical results:
 
@@ -164,7 +164,7 @@ When hit with a 30% straggler drop in Round 2, the system's `State` circuit brea
 
 ---
 
-## 🚀 Getting Started & Installation
+## Getting Started & Installation
 
 To run this project from scratch after pulling the repo, follow these steps:
 
@@ -198,7 +198,7 @@ You can view live metrics by navigating to `http://localhost:5000` in your web b
 
 ---
 
-## ⚙️ Running the Experiments
+## Running the Experiments
 
 The repository includes pre-configured bash scripts for running all Milestone experiments exactly as reported in the paper. 
 
@@ -230,5 +230,5 @@ python baselines/b4_patternized/run_b4.py
 
 ---
 
-## 🤝 Contributing & Extending
+## Contributing & Extending
 The highly decoupled nature of the GoF patterns makes it trivial to swap out modules. To add a new aggregation algorithm, simply create a new class implementing the `IStrategy` interface in `fedpatterns/patterns/strategy/` without touching the training loops or privacy components.
