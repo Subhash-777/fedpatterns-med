@@ -1,0 +1,5 @@
+# Placeholder — to be filled in M2+ when client-side config is needed.
+# num_local_epochs: 1
+# learning_rate: 0.01
+# optimizer: sgd
+# momentum: 0.9

@@ -1,0 +1,1 @@
+{"server_round": 1, "val_loss": 0.1820804637327497, "val_accuracy": 0.6225699694483708, "train_loss": 0.18375008610063442, "straggler_rate": 0.0, "rollback_triggered": false, "epsilon": -1.0, "metrics": {"total_comm_bytes": 16826920.0}}

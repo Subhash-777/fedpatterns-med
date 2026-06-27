@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fedpatterns-med-b3"
+version = "0.1.0"
+description = "B3 Baseline"
+requires-python = ">=3.11"
+
+[tool.flwr.app]
+publisher = "fedpatterns-med"
+
+[tool.flwr.app.components]
+serverapp = "baselines.b3_architectural_pattern_baseline.server_app:app"
+clientapp = "baselines.b3_architectural_pattern_baseline.client_app:app"
+
+[tool.flwr.app.config]
+mlflow-run-id = ""
+mlflow-tracking-uri = ""

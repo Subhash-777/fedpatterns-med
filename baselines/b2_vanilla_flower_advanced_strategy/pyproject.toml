@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fedpatterns-med-b2"
+version = "0.1.0"
+description = "B2 Baseline"
+requires-python = ">=3.11"
+
+[tool.flwr.app]
+publisher = "fedpatterns-med"
+
+[tool.flwr.app.components]
+serverapp = "baselines.b2_vanilla_flower_advanced_strategy.server_app:app"
+clientapp = "baselines.b2_vanilla_flower_advanced_strategy.client_app:app"
+
+[tool.flwr.app.config]
+mlflow-run-id = ""
+mlflow-tracking-uri = ""
+fed_dataset = "PneumoniaMNIST"
+fed_alpha = "0.5"
+fed_noise_multiplier = "1.0"
+fed_enable_dp = "True"
+fed_enable_straggler = "True"

@@ -1,0 +1,7 @@
+# Locked M1 defaults — do not change without updating verification plan
+num_rounds: 3
+fraction_fit: 1.0
+min_fit_clients: 5
+min_evaluate_clients: 5
+min_available_clients: 5
+seed: 42

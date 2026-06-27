@@ -1,0 +1,91 @@
+# Canonical compliance matrix — single source of truth.
+# DO NOT hand-edit the root compliance_matrix.yaml.
+# Run: python scripts/generate_root_compliance.py to regenerate it.
+#
+# Dimensions:
+#   GDPR_Art25:   Data protection by design and by default
+#   GDPR_Art32:   Security of processing
+#   HIPAA_164312: Technical safeguards (access control, audit, transmission security)
+#   DPDP:         India Digital Personal Data Protection Act 2023
+#   ResidualRisk: Qualitative residual risk after pattern application (Low/Medium/High)
+
+patterns:
+  - id: P1
+    name: FederatedMediator
+    file: fedpatterns/patterns/mediator/federated_mediator.py
+    compliance:
+      GDPR_Art25: partial   # Centralises coordination without centralising data
+      GDPR_Art32: partial   # Depends on transport security of mediated channels
+      HIPAA_164312: partial
+      DPDP: partial
+      ResidualRisk: Medium
+
+  - id: P2
+    name: FederatedStrategy
+    file: fedpatterns/patterns/strategy/federated_strategy.py
+    compliance:
+      GDPR_Art25: full      # Enables privacy-preserving aggregation strategies
+      GDPR_Art32: partial
+      HIPAA_164312: partial
+      DPDP: partial
+      ResidualRisk: Low
+
+  - id: P3
+    name: DifferentialDecorator
+    file: fedpatterns/patterns/decorator/differential_decorator.py
+    compliance:
+      GDPR_Art25: full      # DP noise directly implements GDPR data minimisation
+      GDPR_Art32: full      # Cryptographic-level privacy guarantee
+      HIPAA_164312: full
+      DPDP: full
+      ResidualRisk: Low
+
+  - id: P4
+    name: SecureAggregationProxy
+    file: fedpatterns/patterns/proxy/secure_aggregation_proxy.py
+    compliance:
+      GDPR_Art25: full
+      GDPR_Art32: full      # Proxy enforces encryption of gradient traffic
+      HIPAA_164312: full
+      DPDP: full
+      ResidualRisk: Low
+
+  - id: P5
+    name: ConsentObserver
+    file: fedpatterns/patterns/observer/consent_observer.py
+    compliance:
+      GDPR_Art25: full      # Observer pattern enforces consent before data use
+      GDPR_Art32: partial
+      HIPAA_164312: partial
+      DPDP: full            # DPDP requires explicit consent mechanisms
+      ResidualRisk: Low
+
+  - id: P6
+    name: VersionedModelPrototype
+    file: fedpatterns/patterns/prototype/versioned_model_prototype.py
+    compliance:
+      GDPR_Art25: partial
+      GDPR_Art32: partial   # Versioning supports audit trails
+      HIPAA_164312: partial # Supports rollback for data integrity
+      DPDP: partial
+      ResidualRisk: Medium
+
+  - id: P7
+    name: StragglerCircuitBreaker
+    file: fedpatterns/resilience/straggler/straggler_manager.py
+    compliance:
+      GDPR_Art25: none      # Resilience pattern; no direct privacy impact
+      GDPR_Art32: partial   # Availability is a component of Art.32 security
+      HIPAA_164312: partial
+      DPDP: none
+      ResidualRisk: Medium
+
+  - id: P8
+    name: RoundCommandHistory
+    file: fedpatterns/patterns/command/round_command_history.py
+    compliance:
+      GDPR_Art25: partial
+      GDPR_Art32: full      # Full audit log of round commands supports accountability
+      HIPAA_164312: full    # Audit controls requirement
+      DPDP: partial
+      ResidualRisk: Low

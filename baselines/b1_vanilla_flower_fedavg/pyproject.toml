@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fedpatterns-med-b1"
+version = "0.1.0"
+description = "B1 Vanilla FedAvg Baseline"
+requires-python = ">=3.11"
+dependencies = [
+    "flwr[simulation]==1.31.0",
+    "torch",
+    "torchvision",
+    "medmnist",
+    "scikit-learn"
+]
+
+[tool.flwr.app]
+publisher = "fedpatterns-med"
+
+[tool.flwr.app.components]
+serverapp = "baselines.b1_vanilla_flower_fedavg.server_app:app"
+clientapp = "baselines.b1_vanilla_flower_fedavg.client_app:app"
+
+[tool.flwr.app.config]
+mlflow-run-id = ""
+mlflow-tracking-uri = ""
+fed_dataset = "PneumoniaMNIST"
+fed_alpha = "0.5"
+fed_noise_multiplier = "1.0"
+fed_enable_dp = "True"
+fed_enable_straggler = "True"

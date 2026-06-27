@@ -1,0 +1,11 @@
+version: "3.9"
+# Stub for future containerized deployment.
+# Fill in when containerization is needed (M4+).
+services:
+  fedpatterns-server:
+    image: fedpatterns-med:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:8080"

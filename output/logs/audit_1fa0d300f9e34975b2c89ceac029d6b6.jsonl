@@ -1,0 +1,3 @@
+{"server_round": 1, "val_loss": 2.2760126101665006, "val_accuracy": 0.625, "train_loss": 0.17725576644089636, "straggler_rate": 0.0, "rollback_triggered": false, "epsilon": -1.0, "metrics": {"total_comm_bytes": 16826920.0}}
+{"server_round": 2, "val_loss": 0.3641328834570371, "val_accuracy": 0.844551282051282, "train_loss": 0.1539605495895448, "straggler_rate": 0.0, "rollback_triggered": false, "epsilon": -1.0, "metrics": {"total_comm_bytes": 16826920.0}}
+{"server_round": 3, "val_loss": 3.504396249086429, "val_accuracy": 0.625, "train_loss": 0.06699980926329911, "straggler_rate": 0.0, "rollback_triggered": true, "epsilon": -1.0, "metrics": {"total_comm_bytes": 16826920.0}}

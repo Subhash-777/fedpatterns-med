@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fedpatterns-med"
+version = "0.1.0"
+description = "Design pattern language for federated learning in healthcare"
+requires-python = ">=3.11"
+dependencies = [
+    # Pinned at install time: pip show flwr | grep Version → 1.31.0
+    # Note: flwr PyPI versioning is 1.x; "Flower 2.0" = the ClientApp/ServerApp/flwr-run
+    # API redesign shipped starting in 1.8+. 1.31.0 is the latest stable release.
+    "flwr[simulation]==1.31.0",
+    "torch",
+    "torchvision",
+    "medmnist",
+    "opacus",
+    "fastapi",
+    "uvicorn",
+    "pymongo",
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "radon",
+    "mlflow",
+    "pyyaml",
+]
+
+[tool.setuptools.packages.find]
+include = ["fedpatterns*", "apps*", "baselines*"]
+
+# ──────────────────────────────────────────────────────────────
+# Flower 1.31.0 app configuration
+# Note: federation/simulation config (num-supernodes, client-resources) lives
+# in ~/.flwr/config.toml under [superlink.local] — NOT in pyproject.toml.
+# flwr 1.31.0 treats [tool.flwr.federations.*] in pyproject.toml as legacy.
+# Run with: flwr run . local --stream
+# ──────────────────────────────────────────────────────────────
+[tool.flwr.app]
+publisher = "fedpatterns-med"
+
+[tool.flwr.app.components]
+serverapp = "apps.server_app.main:app"
+clientapp = "apps.client_app.main:app"
+
+# Keys here are overridden at launch time via:
+#   flwr run . local --run-config 'mlflow-run-id=<id>' --run-config 'mlflow-tracking-uri=<uri>'
+# This is the proper Flower 2.x mechanism to pass runtime config into app bundles.
+[tool.flwr.app.config]
+mlflow-run-id = ""
+mlflow-tracking-uri = ""
+fed_dataset = "PneumoniaMNIST"
+fed_alpha = "0.5"
+fed_noise_multiplier = "1.0"
+fed_enable_dp = "True"
+fed_enable_straggler = "True"

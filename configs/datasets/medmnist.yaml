@@ -1,0 +1,8 @@
+dataset: PneumoniaMNIST
+image_size: 28
+num_channels: 1
+batch_size: 32
+num_clients: 5
+alpha: 0.5  # Dirichlet non-IID parameter (lower = more heterogeneous)
+num_classes: 2  # binary for PneumoniaMNIST; update for NIH (14) / ISIC (2)
+task: binary_classification  # binary_classification | multilabel_classification

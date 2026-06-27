@@ -1,0 +1,9 @@
+"""
+apps/server_app/main.py — Stable re-export of the active baseline's ServerApp.
+
+To switch baselines, update the import below. Do NOT change pyproject.toml.
+"""
+
+from fedpatterns.core.app.server_app import app  # M2 Patternized active baseline
+
+__all__ = ["app"]

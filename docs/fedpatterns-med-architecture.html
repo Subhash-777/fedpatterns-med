@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FedPatterns-Med — System Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;
+  --color-surface-offset:#f0ede8;--color-border:rgba(40,37,29,0.12);
+  --color-text:#28251d;--color-text-muted:#7a7974;--color-text-faint:#bab9b4;
+  --color-primary:#01696f;--color-primary-hover:#0c4e54;
+  --color-primary-glow:rgba(1,105,111,0.15);
+  --color-blue:#006494;--color-blue-bg:rgba(0,100,148,0.08);
+  --color-purple:#7a39bb;--color-purple-bg:rgba(122,57,187,0.08);
+  --color-success:#437a22;--color-success-bg:rgba(67,122,34,0.08);
+  --color-warning:#964219;--color-warning-bg:rgba(150,66,25,0.08);
+  --color-error:#a12c7b;--color-error-bg:rgba(161,44,123,0.08);
+  --color-gold:#b07a00;--color-gold-bg:rgba(176,122,0,0.08);
+  --shadow-sm:0 1px 3px rgba(40,37,29,0.08);
+  --shadow-md:0 4px 16px rgba(40,37,29,0.10);
+  --shadow-lg:0 12px 40px rgba(40,37,29,0.14);
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;
+  --font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+[data-theme="dark"]{
+  --color-bg:#0f0e0d;--color-surface:#161513;--color-surface-2:#1b1a18;
+  --color-surface-offset:#201f1c;--color-border:rgba(255,255,255,0.08);
+  --color-text:#d4d2ce;--color-text-muted:#7a7876;--color-text-faint:#4a4946;
+  --color-primary:#3d9ba6;--color-primary-hover:#4fb8c6;
+  --color-primary-glow:rgba(61,155,166,0.18);
+  --color-blue:#5591c7;--color-blue-bg:rgba(85,145,199,0.10);
+  --color-purple:#a86fdf;--color-purple-bg:rgba(168,111,223,0.10);
+  --color-success:#6daa45;--color-success-bg:rgba(109,170,69,0.10);
+  --color-warning:#fdab43;--color-warning-bg:rgba(253,171,67,0.10);
+  --color-error:#d163a7;--color-error-bg:rgba(209,99,167,0.10);
+  --color-gold:#e8af34;--color-gold-bg:rgba(232,175,52,0.10);
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--color-bg);color:var(--color-text);min-height:100vh;line-height:1.5}
+
+/* HEADER */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:var(--color-bg);
+  border-bottom:1px solid var(--color-border);
+  padding:0.75rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(12px);
+}
+.header-logo{display:flex;align-items:center;gap:0.625rem}
+.logo-mark{width:28px;height:28px;flex-shrink:0}
+.header-title{font-size:0.9375rem;font-weight:600;letter-spacing:-0.01em;color:var(--color-text)}
+.header-subtitle{font-size:0.75rem;color:var(--color-text-muted);margin-top:1px}
+.header-right{display:flex;align-items:center;gap:1rem}
+.theme-btn{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);padding:0.375rem 0.75rem;
+  font-size:0.75rem;font-family:var(--font-body);cursor:pointer;
+  color:var(--color-text-muted);transition:all 180ms ease
+}
+.theme-btn:hover{color:var(--color-text);border-color:var(--color-primary)}
+.badge{
+  font-size:0.6875rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
+  padding:0.25rem 0.625rem;border-radius:var(--radius-full,9999px);
+  background:var(--color-primary-glow);color:var(--color-primary);border:1px solid var(--color-primary-glow)
+}
+
+/* LAYOUT */
+.page{max-width:1320px;margin:0 auto;padding:2rem}
+.section-title{
+  font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--color-text-muted);margin-bottom:1rem
+}
+
+/* HERO INTRO */
+.intro-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);padding:1.5rem 2rem;margin-bottom:2rem;
+  display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:center
+}
+.intro-text h1{font-size:1.375rem;font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin-bottom:0.5rem}
+.intro-text p{font-size:0.875rem;color:var(--color-text-muted);max-width:60ch;line-height:1.6}
+.intro-stats{display:flex;gap:1.5rem}
+.stat{text-align:center}
+.stat-num{font-size:1.5rem;font-weight:700;color:var(--color-primary);font-variant-numeric:tabular-nums}
+.stat-label{font-size:0.6875rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.06em}
+
+/* DATASET TABLE */
+.datasets-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.ds-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);padding:1.25rem;
+  transition:box-shadow 180ms ease,border-color 180ms ease;cursor:default
+}
+.ds-card:hover{box-shadow:var(--shadow-md);border-color:var(--color-primary)}
+.ds-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem}
+.ds-icon{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.ds-tag{font-size:0.6875rem;font-weight:600;padding:0.2rem 0.5rem;border-radius:var(--radius-full,9999px);letter-spacing:0.03em}
+.ds-name{font-size:0.9375rem;font-weight:600;margin-bottom:0.25rem;letter-spacing:-0.01em}
+.ds-desc{font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.875rem;line-height:1.5}
+.ds-meta{display:flex;flex-wrap:wrap;gap:0.375rem}
+.meta-pill{
+  font-size:0.6875rem;font-family:var(--font-mono);padding:0.2rem 0.5rem;
+  background:var(--color-surface-offset);border-radius:var(--radius-sm);
+  color:var(--color-text-muted);border:1px solid var(--color-border)
+}
+.ds-link{
+  display:inline-flex;align-items:center;gap:0.375rem;margin-top:0.875rem;
+  font-size:0.8125rem;font-weight:500;color:var(--color-primary);
+  text-decoration:none;border-bottom:1px solid transparent;
+  transition:border-color 180ms ease
+}
+.ds-link:hover{border-bottom-color:var(--color-primary)}
+
+/* ARCHITECTURE DIAGRAM */
+.arch-wrapper{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);padding:2rem;margin-bottom:2rem;overflow-x:auto
+}
+.arch-diagram{min-width:900px;position:relative}
+.arch-row{display:flex;align-items:stretch;gap:1rem;margin-bottom:1rem}
+.arch-row.centered{justify-content:center}
+.arch-spacer{flex:1}
+.arch-label{
+  font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--color-text-faint);writing-mode:vertical-rl;text-orientation:mixed;
+  display:flex;align-items:center;justify-content:center;padding:0.5rem;
+  min-width:28px;flex-shrink:0
+}
+
+/* NODES */
+.node{
+  background:var(--color-surface-2);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);padding:0.875rem 1rem;
+  display:flex;flex-direction:column;gap:0.375rem;
+  transition:box-shadow 180ms ease,border-color 180ms ease;cursor:default;
+  position:relative;flex:1;min-width:0
+}
+.node:hover{box-shadow:var(--shadow-md)}
+.node-title{font-size:0.8125rem;font-weight:600;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node-pattern{font-size:0.6875rem;font-family:var(--font-mono);color:var(--color-text-muted)}
+.node-badge{
+  font-size:0.625rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;
+  padding:0.15rem 0.4rem;border-radius:var(--radius-sm);align-self:flex-start;
+  border:1px solid transparent
+}
+/* color themes for nodes */
+.node.teal{border-color:rgba(61,155,166,0.3);background:color-mix(in oklch,var(--color-primary) 6%,var(--color-surface-2))}
+.node.teal:hover{border-color:var(--color-primary);box-shadow:0 0 0 2px var(--color-primary-glow)}
+.node.blue{border-color:rgba(85,145,199,0.3);background:var(--color-blue-bg)}
+.node.blue:hover{border-color:var(--color-blue)}
+.node.purple{border-color:rgba(168,111,223,0.3);background:var(--color-purple-bg)}
+.node.purple:hover{border-color:var(--color-purple)}
+.node.green{border-color:rgba(109,170,69,0.3);background:var(--color-success-bg)}
+.node.green:hover{border-color:var(--color-success)}
+.node.orange{border-color:rgba(253,171,67,0.3);background:var(--color-warning-bg)}
+.node.orange:hover{border-color:var(--color-warning)}
+.node.pink{border-color:rgba(209,99,167,0.3);background:var(--color-error-bg)}
+.node.pink:hover{border-color:var(--color-error)}
+.node.gold{border-color:rgba(232,175,52,0.3);background:var(--color-gold-bg)}
+.node.gold:hover{border-color:var(--color-gold)}
+.node.center{align-items:center;text-align:center;flex:2;padding:1.25rem}
+.node.center .node-title{font-size:1rem;white-space:normal;text-align:center}
+
+.badge-teal{background:var(--color-primary-glow);color:var(--color-primary);border-color:var(--color-primary-glow)}
+.badge-blue{background:var(--color-blue-bg);color:var(--color-blue);border-color:var(--color-blue-bg)}
+.badge-purple{background:var(--color-purple-bg);color:var(--color-purple);border-color:var(--color-purple-bg)}
+.badge-green{background:var(--color-success-bg);color:var(--color-success);border-color:var(--color-success-bg)}
+.badge-orange{background:var(--color-warning-bg);color:var(--color-warning);border-color:var(--color-warning-bg)}
+.badge-pink{background:var(--color-error-bg);color:var(--color-error);border-color:var(--color-error-bg)}
+.badge-gold{background:var(--color-gold-bg);color:var(--color-gold);border-color:var(--color-gold-bg)}
+
+/* CONNECTORS */
+.connector-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;height:2rem;position:relative
+}
+.conn-line{flex:1;height:1px;background:var(--color-border)}
+.conn-arrow{
+  width:1rem;height:1rem;color:var(--color-text-faint);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:0.75rem
+}
+.conn-vert{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:1.5rem;gap:0
+}
+.conn-vert svg{color:var(--color-text-faint)}
+.conn-label{
+  font-size:0.625rem;font-family:var(--font-mono);color:var(--color-text-faint);
+  background:var(--color-bg);padding:0 0.375rem;white-space:nowrap;
+  border-radius:var(--radius-sm);border:1px solid var(--color-border)
+}
+
+/* SVG arrows */
+.arch-svg{width:100%;overflow:visible;display:block}
+
+/* PATTERN CATALOG */
+.patterns-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:2rem}
+.pat-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);padding:1rem;
+  transition:box-shadow 180ms ease,border-color 180ms ease;cursor:default
+}
+.pat-card:hover{box-shadow:var(--shadow-md)}
+.pat-num{font-size:0.6875rem;font-family:var(--font-mono);color:var(--color-text-faint);margin-bottom:0.25rem}
+.pat-name{font-size:0.875rem;font-weight:600;letter-spacing:-0.01em;margin-bottom:0.25rem}
+.pat-gof{font-size:0.6875rem;font-family:var(--font-mono);color:var(--color-text-muted);margin-bottom:0.5rem}
+.pat-desc{font-size:0.75rem;color:var(--color-text-muted);line-height:1.5;margin-bottom:0.5rem}
+.pat-compliance{display:flex;flex-wrap:wrap;gap:0.25rem}
+.comp-pill{
+  font-size:0.5625rem;font-weight:700;padding:0.15rem 0.4rem;
+  border-radius:var(--radius-sm);letter-spacing:0.04em;text-transform:uppercase;
+  border:1px solid transparent
+}
+.comp-gdpr{background:rgba(61,155,166,0.1);color:var(--color-primary);border-color:rgba(61,155,166,0.2)}
+.comp-hipaa{background:rgba(109,170,69,0.1);color:var(--color-success);border-color:rgba(109,170,69,0.2)}
+.comp-risk-low{background:rgba(109,170,69,0.08);color:var(--color-success)}
+.comp-risk-med{background:rgba(253,171,67,0.08);color:var(--color-warning)}
+.comp-risk-high{background:rgba(209,99,167,0.08);color:var(--color-error)}
+
+/* EXPERIMENT TABLE */
+.exp-table{width:100%;border-collapse:collapse;font-size:0.8125rem;margin-bottom:2rem}
+.exp-table th{
+  text-align:left;font-size:0.6875rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--color-text-muted);padding:0.625rem 1rem;
+  border-bottom:2px solid var(--color-border);background:var(--color-surface)
+}
+.exp-table td{
+  padding:0.75rem 1rem;border-bottom:1px solid var(--color-border);
+  vertical-align:top;color:var(--color-text)
+}
+.exp-table tr:hover td{background:var(--color-surface-offset)}
+.exp-table td:first-child{font-weight:600;font-family:var(--font-mono);font-size:0.75rem;color:var(--color-primary)}
+.table-wrap{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);overflow:hidden;margin-bottom:2rem
+}
+
+/* FL ROUND DIAGRAM */
+.round-flow{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);padding:1.5rem 2rem;margin-bottom:2rem;
+  flex-wrap:wrap;gap:1rem
+}
+.round-step{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:0.5rem;flex:1;min-width:100px
+}
+.round-circle{
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.25rem;font-weight:700;font-family:var(--font-mono);
+  border:2px solid var(--color-border);background:var(--color-surface-2)
+}
+.round-step-name{font-size:0.75rem;font-weight:600;letter-spacing:-0.01em}
+.round-step-desc{font-size:0.6875rem;color:var(--color-text-muted);max-width:10ch;line-height:1.4}
+.round-arrow{color:var(--color-text-faint);font-size:1.25rem;flex-shrink:0;padding:0 0.25rem;align-self:center;padding-bottom:1.5rem}
+
+/* FOOTER */
+.footer{
+  border-top:1px solid var(--color-border);padding:1.5rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:0.75rem;color:var(--color-text-muted);flex-wrap:wrap;gap:0.75rem
+}
+.footer-links{display:flex;gap:1rem}
+.footer-links a{
+  color:var(--color-text-muted);text-decoration:none;
+  transition:color 180ms ease
+}
+.footer-links a:hover{color:var(--color-primary)}
+
+@media(max-width:900px){
+  .datasets-grid{grid-template-columns:1fr 1fr}
+  .patterns-grid{grid-template-columns:1fr 1fr}
+  .intro-card{grid-template-columns:1fr}
+  .intro-stats{flex-wrap:wrap}
+  .page{padding:1rem}
+}
+@media(max-width:600px){
+  .datasets-grid{grid-template-columns:1fr}
+  .patterns-grid{grid-template-columns:1fr}
+  .header{padding:0.75rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">
+    <svg class="logo-mark" viewBox="0 0 28 28" fill="none" aria-label="FedPatterns logo">
+      <rect x="2" y="2" width="10" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+      <rect x="16" y="2" width="10" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+      <rect x="2" y="16" width="10" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+      <rect x="16" y="16" width="10" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+      <circle cx="14" cy="14" r="3.5" fill="currentColor" style="color:var(--color-primary)"/>
+      <line x1="7" y1="12" x2="11.5" y2="12.5" stroke="currentColor" stroke-width="1.2" opacity="0.5" style="color:var(--color-primary)"/>
+      <line x1="21" y1="12" x2="16.5" y2="12.5" stroke="currentColor" stroke-width="1.2" opacity="0.5" style="color:var(--color-primary)"/>
+      <line x1="7" y1="16" x2="11.5" y2="15.5" stroke="currentColor" stroke-width="1.2" opacity="0.5" style="color:var(--color-primary)"/>
+      <line x1="21" y1="16" x2="16.5" y2="15.5" stroke="currentColor" stroke-width="1.2" opacity="0.5" style="color:var(--color-primary)"/>
+    </svg>
+    <div>
+      <div class="header-title">FedPatterns-Med</div>
+      <div class="header-subtitle">System Architecture & Dataset Reference</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge">Journal Paper Reference</span>
+    <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">☀ Light</button>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- INTRO -->
+  <div class="intro-card">
+    <div class="intro-text">
+      <h1>OO Design Pattern Language for<br>Privacy-Compliant Federated Learning</h1>
+      <p>A formal catalog of GoF-level design patterns applied at the component implementation layer of FL systems — mapping each pattern to GDPR, HIPAA, and India DPDP compliance constraints — validated on real medical imaging benchmarks.</p>
+    </div>
+    <div class="intro-stats">
+      <div class="stat"><div class="stat-num">12</div><div class="stat-label">Patterns</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Datasets</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Experiments</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">FL Clients</div></div>
+    </div>
+  </div>
+
+  <!-- DATASETS -->
+  <p class="section-title">📁 Recommended Datasets — Direct Links</p>
+  <div class="datasets-grid">
+
+    <div class="ds-card">
+      <div class="ds-header">
+        <div class="ds-icon" style="background:var(--color-blue-bg);font-size:1.1rem">🫁</div>
+        <span class="ds-tag badge-blue" style="background:var(--color-blue-bg);color:var(--color-blue);border:1px solid rgba(85,145,199,0.2)">Primary</span>
+      </div>
+      <div class="ds-name">NIH ChestX-ray14</div>
+      <div class="ds-desc">112,120 frontal chest X-rays · 14 disease labels · 30,805 unique patients. The gold standard for chest pathology FL benchmarks.</div>
+      <div class="ds-meta">
+        <span class="meta-pill">112K images</span>
+        <span class="meta-pill">14 classes</span>
+        <span class="meta-pill">Multi-label</span>
+        <span class="meta-pill">Free · No IRB</span>
+      </div>
+      <a class="ds-link" href="https://www.kaggle.com/datasets/nih-chest-xrays/data" target="_blank" rel="noopener noreferrer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Kaggle — nih-chest-xrays/data
+      </a>
+      <a class="ds-link" href="https://nihcc.app.box.com/v/ChestXray-NIHCC" target="_blank" rel="noopener noreferrer" style="margin-top:0.25rem">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        NIH Official — nihcc.app.box.com
+      </a>
+    </div>
+
+    <div class="ds-card">
+      <div class="ds-header">
+        <div class="ds-icon" style="background:var(--color-purple-bg);font-size:1.1rem">🔬</div>
+        <span class="ds-tag" style="background:var(--color-purple-bg);color:var(--color-purple);border:1px solid rgba(168,111,223,0.2)">Multi-modal</span>
+      </div>
+      <div class="ds-name">MedMNIST v2</div>
+      <div class="ds-desc">18 standardized biomedical imaging datasets in a single pip package. 12 2D + 6 3D datasets. Covers X-Ray, OCT, Dermatology, Pathology, Ultrasound, CT.</div>
+      <div class="ds-meta">
+        <span class="meta-pill">18 datasets</span>
+        <span class="meta-pill">pip install</span>
+        <span class="meta-pill">28×28 standard</span>
+        <span class="meta-pill">CC-BY 4.0</span>
+      </div>
+      <a class="ds-link" href="https://medmnist.com" target="_blank" rel="noopener noreferrer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        medmnist.com (official)
+      </a>
+      <a class="ds-link" href="https://zenodo.org/records/6496656" target="_blank" rel="noopener noreferrer" style="margin-top:0.25rem">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Zenodo — Direct Download
+      </a>
+    </div>
+
+    <div class="ds-card">
+      <div class="ds-header">
+        <div class="ds-icon" style="background:var(--color-success-bg);font-size:1.1rem">🩺</div>
+        <span class="ds-tag" style="background:var(--color-success-bg);color:var(--color-success);border:1px solid rgba(109,170,69,0.2)">Dermatology</span>
+      </div>
+      <div class="ds-name">ISIC 2020 Skin Lesion</div>
+      <div class="ds-desc">33,126 dermoscopic images from 2,000+ patients · Malignant vs benign · Multi-site origin — ideal for simulating non-IID hospital data splits.</div>
+      <div class="ds-meta">
+        <span class="meta-pill">33K images</span>
+        <span class="meta-pill">JPEG + DICOM</span>
+        <span class="meta-pill">Multi-site</span>
+        <span class="meta-pill">CC-BY-NC</span>
+      </div>
+      <a class="ds-link" href="https://challenge2020.isic-archive.com" target="_blank" rel="noopener noreferrer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        challenge2020.isic-archive.com
+      </a>
+      <a class="ds-link" href="https://www.isic-archive.com" target="_blank" rel="noopener noreferrer" style="margin-top:0.25rem">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        isic-archive.com (full archive)
+      </a>
+    </div>
+
+  </div>
+
+  <!-- FL ROUND FLOW -->
+  <p class="section-title">🔄 Federated Learning Round — How It Works</p>
+  <div class="round-flow">
+    <div class="round-step">
+      <div class="round-circle" style="border-color:var(--color-primary);color:var(--color-primary)">S</div>
+      <div class="round-step-name">Global Server</div>
+      <div class="round-step-desc">Broadcasts initial weights</div>
+    </div>
+    <div class="round-arrow">→</div>
+    <div class="round-step">
+      <div class="round-circle" style="border-color:var(--color-blue);color:var(--color-blue)">C1</div>
+      <div class="round-step-name">Hospital A</div>
+      <div class="round-step-desc">Local training on X-rays</div>
+    </div>
+    <div class="round-arrow">↕</div>
+    <div class="round-step">
+      <div class="round-circle" style="border-color:var(--color-purple);color:var(--color-purple)">C2</div>
+      <div class="round-step-name">Hospital B</div>
+      <div class="round-step-desc">Local training on skin lesions</div>
+    </div>
+    <div class="round-arrow">↕</div>
+    <div class="round-step">
+      <div class="round-circle" style="border-color:var(--color-success);color:var(--color-success)">C3</div>
+      <div class="round-step-name">Hospital C</div>
+      <div class="round-step-desc">Local training on OCT scans</div>
+    </div>
+    <div class="round-arrow">←</div>
+    <div class="round-step">
+      <div class="round-circle" style="border-color:var(--color-warning);color:var(--color-warning)">DP</div>
+      <div class="round-step-name">DP Decorator</div>
+      <div class="round-step-desc">Noise injection before upload</div>
+    </div>
+    <div class="round-arrow">←</div>
+    <div class="round-step">
+      <div class="round-circle" style="border-color:var(--color-primary);color:var(--color-primary)">∑</div>
+      <div class="round-step-name">FedAvg/FedProx</div>
+      <div class="round-step-desc">Federated Strategy aggregation</div>
+    </div>
+  </div>
+
+  <!-- SYSTEM ARCHITECTURE -->
+  <p class="section-title">🏗 Full System Architecture — Component & Pattern Map</p>
+  <div class="arch-wrapper">
+    <div class="arch-diagram">
+
+      <!-- LAYER 0: Regulation / Compliance Layer (top) -->
+      <div style="text-align:center;margin-bottom:0.75rem">
+        <div style="display:inline-flex;align-items:center;gap:2rem;background:var(--color-surface-offset);border:1px dashed var(--color-border);border-radius:var(--radius-lg);padding:0.625rem 1.5rem">
+          <span style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-text-muted)">Compliance Envelope</span>
+          <span class="comp-pill comp-gdpr">GDPR Art.25</span>
+          <span class="comp-pill comp-gdpr">GDPR Art.32</span>
+          <span class="comp-pill comp-hipaa">HIPAA §164</span>
+          <span class="comp-pill" style="background:rgba(168,111,223,0.1);color:var(--color-purple);border-color:rgba(168,111,223,0.2)">India DPDP</span>
+          <span class="comp-pill comp-gdpr">ISO 27701</span>
+        </div>
+      </div>
+
+      <svg height="28" viewBox="0 0 900 28" class="arch-svg" aria-hidden="true">
+        <line x1="450" y1="0" x2="450" y2="28" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="445,20 455,20 450,28" fill="var(--color-text-faint)"/>
+      </svg>
+
+      <!-- LAYER 1: Central Aggregation Server -->
+      <div class="arch-row centered">
+        <div class="node teal center" style="max-width:520px">
+          <div style="display:flex;align-items:center;gap:0.625rem;margin-bottom:0.5rem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary);flex-shrink:0"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <div class="node-title" style="font-size:1rem;white-space:normal">Central Aggregation Server</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.375rem;justify-content:center">
+            <span class="node-badge badge-teal">FederatedMediator</span>
+            <span class="node-badge badge-teal">FederatedStrategy</span>
+            <span class="node-badge badge-gold">RoundCommandHistory</span>
+            <span class="node-badge badge-purple">VersionedModelPrototype</span>
+          </div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.5rem">FastAPI · MongoDB · Flower Server · Python 3.11</div>
+        </div>
+      </div>
+
+      <!-- SVG arrows fanning out to clients -->
+      <svg height="56" viewBox="0 0 900 56" class="arch-svg" aria-hidden="true">
+        <!-- center vertical to 5 clients -->
+        <line x1="450" y1="0" x2="180" y2="56" stroke="var(--color-border)" stroke-width="1.2"/>
+        <line x1="450" y1="0" x2="315" y2="56" stroke="var(--color-border)" stroke-width="1.2"/>
+        <line x1="450" y1="0" x2="450" y2="56" stroke="var(--color-border)" stroke-width="1.2"/>
+        <line x1="450" y1="0" x2="585" y2="56" stroke="var(--color-border)" stroke-width="1.2"/>
+        <line x1="450" y1="0" x2="720" y2="56" stroke="var(--color-border)" stroke-width="1.2"/>
+        <!-- labels -->
+        <text x="290" y="30" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--color-text-faint)" text-anchor="middle">weights ↓  gradients ↑</text>
+        <text x="610" y="30" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--color-text-faint)" text-anchor="middle">weights ↓  gradients ↑</text>
+      </svg>
+
+      <!-- LAYER 2: FL Clients (Simulated Hospitals) -->
+      <div class="arch-row" style="gap:0.75rem">
+        <div class="node blue">
+          <span class="node-badge badge-blue" style="margin-bottom:0.25rem">Hospital A</span>
+          <div class="node-title">NIH Chest X-ray Client</div>
+          <div class="node-pattern">FederatedStrategy</div>
+          <div class="node-pattern">DifferentialDecorator</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-faint);margin-top:0.375rem">ResNet-50 · 22K imgs</div>
+        </div>
+        <div class="node purple">
+          <span class="node-badge badge-purple" style="margin-bottom:0.25rem">Hospital B</span>
+          <div class="node-title">ISIC Dermatology Client</div>
+          <div class="node-pattern">FederatedStrategy</div>
+          <div class="node-pattern">ConsentObserver</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-faint);margin-top:0.375rem">EfficientNet · 6K imgs</div>
+        </div>
+        <div class="node green">
+          <span class="node-badge badge-green" style="margin-bottom:0.25rem">Hospital C</span>
+          <div class="node-title">MedMNIST OCT Client</div>
+          <div class="node-pattern">FederatedStrategy</div>
+          <div class="node-pattern">StragglerCircuitBreaker</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-faint);margin-top:0.375rem">CNN · 10K imgs</div>
+        </div>
+        <div class="node orange">
+          <span class="node-badge badge-orange" style="margin-bottom:0.25rem">Hospital D</span>
+          <div class="node-title">Pathology Client</div>
+          <div class="node-pattern">FederatedStrategy</div>
+          <div class="node-pattern">DataPartitionBuilder</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-faint);margin-top:0.375rem">ViT-Small · 8K imgs</div>
+        </div>
+        <div class="node pink">
+          <span class="node-badge badge-pink" style="margin-bottom:0.25rem">Hospital E</span>
+          <div class="node-title">Retina Scan Client</div>
+          <div class="node-pattern">FederatedStrategy</div>
+          <div class="node-pattern">HeterogeneityAdapterFactory</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-faint);margin-top:0.375rem">MobileNet · 1.6K imgs</div>
+        </div>
+      </div>
+
+      <!-- Arrow down to privacy layer -->
+      <svg height="36" viewBox="0 0 900 36" class="arch-svg" aria-hidden="true">
+        <line x1="450" y1="0" x2="450" y2="36" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="445,28 455,28 450,36" fill="var(--color-text-faint)"/>
+        <text x="470" y="20" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--color-text-faint)">DP noise applied before sending weights</text>
+      </svg>
+
+      <!-- LAYER 3: Privacy & Security -->
+      <div class="arch-row" style="gap:0.75rem">
+        <div class="node gold">
+          <div class="node-title">DifferentialDecorator</div>
+          <div class="node-pattern">GoF: Decorator</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Gaussian/Laplace noise on gradients · ε-DP via Opacus</div>
+        </div>
+        <div class="node blue">
+          <div class="node-title">SecureAggregationProxy</div>
+          <div class="node-pattern">GoF: Proxy</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Homomorphic encryption intercept · PySyft wrapper</div>
+        </div>
+        <div class="node teal">
+          <div class="node-title">ConsentObserver</div>
+          <div class="node-pattern">GoF: Observer</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">GDPR consent events · real-time client eviction</div>
+        </div>
+        <div class="node purple">
+          <div class="node-title">DataPartitionBuilder</div>
+          <div class="node-pattern">GoF: Builder</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">IID / Non-IID splits · Dirichlet α parameter</div>
+        </div>
+      </div>
+
+      <!-- Arrow down -->
+      <svg height="36" viewBox="0 0 900 36" class="arch-svg" aria-hidden="true">
+        <line x1="450" y1="0" x2="450" y2="36" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="445,28 455,28 450,36" fill="var(--color-text-faint)"/>
+      </svg>
+
+      <!-- LAYER 4: Resilience & Recovery -->
+      <div class="arch-row" style="gap:0.75rem">
+        <div class="node green">
+          <div class="node-title">StragglerCircuitBreaker</div>
+          <div class="node-pattern">GoF: Chain of Resp.</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Drops clients > timeout · proceeds with partial quorum</div>
+        </div>
+        <div class="node orange">
+          <div class="node-title">VersionedModelPrototype</div>
+          <div class="node-pattern">GoF: Prototype + Memento</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Checkpoint clone · rollback on poisoning detection</div>
+        </div>
+        <div class="node pink">
+          <div class="node-title">RoundCommandHistory</div>
+          <div class="node-pattern">GoF: Command</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Each FL round as undoable command · audit log replay</div>
+        </div>
+        <div class="node gold">
+          <div class="node-title">HeterogeneityAdapterFactory</div>
+          <div class="node-pattern">GoF: Abstract Factory</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Edge / Cloud / GPU / CPU adapters per client hardware</div>
+        </div>
+      </div>
+
+      <!-- Arrow down to infra -->
+      <svg height="36" viewBox="0 0 900 36" class="arch-svg" aria-hidden="true">
+        <line x1="450" y1="0" x2="450" y2="36" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="445,28 455,28 450,36" fill="var(--color-text-faint)"/>
+      </svg>
+
+      <!-- LAYER 5: Infrastructure -->
+      <div class="arch-row" style="gap:0.75rem">
+        <div class="node" style="flex:1.5">
+          <div class="node-title" style="font-size:0.8125rem;font-weight:600">Flower Framework (flwr)</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">gRPC transport · Strategy interface · ClientManager · ServerApp</div>
+        </div>
+        <div class="node">
+          <div class="node-title">PyTorch + Opacus</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Local training · DP noise injection</div>
+        </div>
+        <div class="node">
+          <div class="node-title">FastAPI + MongoDB</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">REST endpoints · pattern registry · audit logs</div>
+        </div>
+        <div class="node">
+          <div class="node-title">Docker Compose</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">Simulated multi-client environment · 1 server + 5 clients</div>
+        </div>
+        <div class="node">
+          <div class="node-title">Radon + SonarQube</div>
+          <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-top:0.25rem">CBO · LCOM · cyclomatic complexity metrics</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PATTERN CATALOG -->
+  <p class="section-title">🧩 Pattern Catalog — 12 GoF-Level FL Patterns</p>
+  <div class="patterns-grid">
+
+    <div class="pat-card">
+      <div class="pat-num">P-01</div>
+      <div class="pat-name">FederatedMediator</div>
+      <div class="pat-gof">GoF: Mediator</div>
+      <div class="pat-desc">Aggregation server coordinates without clients knowing each other. Prevents tight coupling between FL participants.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-02</div>
+      <div class="pat-name">DifferentialDecorator</div>
+      <div class="pat-gof">GoF: Decorator</div>
+      <div class="pat-desc">Wraps any gradient update with DP noise injection. Swappable ε values without touching training code.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR Art.25 ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-03</div>
+      <div class="pat-name">FederatedStrategy</div>
+      <div class="pat-gof">GoF: Strategy</div>
+      <div class="pat-desc">FedAvg / FedProx / FedNova swappable behind common interface. Algorithm choice decoupled from client training.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-04</div>
+      <div class="pat-name">SecureAggregationProxy</div>
+      <div class="pat-gof">GoF: Proxy</div>
+      <div class="pat-desc">Intercepts weight transmission, applies homomorphic encryption transparently before forwarding to server.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR Art.32 ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-05</div>
+      <div class="pat-name">ConsentObserver</div>
+      <div class="pat-gof">GoF: Observer</div>
+      <div class="pat-desc">Client notifies server when patient consent policy changes. Server evicts client from current round automatically.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR Art.7 ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ⚠</span>
+        <span class="comp-pill comp-risk-med">Risk: Medium</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-06</div>
+      <div class="pat-name">StragglerCircuitBreaker</div>
+      <div class="pat-gof">GoF: Chain of Responsibility</div>
+      <div class="pat-desc">Drops clients exceeding timeout threshold without blocking the FL round. Partial quorum continues training.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-07</div>
+      <div class="pat-name">VersionedModelPrototype</div>
+      <div class="pat-gof">GoF: Prototype + Memento</div>
+      <div class="pat-desc">Clones global model at each round. Restores last clean checkpoint when poisoning attack detected by validation.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ⚠</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-med">Risk: Medium</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-08</div>
+      <div class="pat-name">RoundCommandHistory</div>
+      <div class="pat-gof">GoF: Command</div>
+      <div class="pat-desc">Each FL round encapsulated as a reversible Command object. Enables regulatory audit trail replay for HIPAA compliance.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ⚠ Risk</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-high">Risk: High</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-09</div>
+      <div class="pat-name">DataPartitionBuilder</div>
+      <div class="pat-gof">GoF: Builder</div>
+      <div class="pat-desc">Constructs IID or Non-IID data splits step-by-step. Dirichlet α controls heterogeneity per simulated hospital.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR Art.25 ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-10</div>
+      <div class="pat-name">HeterogeneityAdapterFactory</div>
+      <div class="pat-gof">GoF: Abstract Factory</div>
+      <div class="pat-desc">Creates appropriate client adapters for edge / cloud / GPU / CPU hardware without changing core FL logic.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-11</div>
+      <div class="pat-name">FedModelSingleton</div>
+      <div class="pat-gof">GoF: Singleton</div>
+      <div class="pat-desc">Ensures exactly one global model instance exists per round on the server. Prevents race conditions during aggregation.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <div class="pat-num">P-12</div>
+      <div class="pat-name">GradientIterator</div>
+      <div class="pat-gof">GoF: Iterator</div>
+      <div class="pat-desc">Traverses client gradient updates sequentially without exposing internal gradient collection structure to aggregator.</div>
+      <div class="pat-compliance">
+        <span class="comp-pill comp-gdpr">GDPR ✓</span>
+        <span class="comp-pill comp-hipaa">HIPAA ✓</span>
+        <span class="comp-pill comp-risk-low">Risk: Low</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EXPERIMENTS TABLE -->
+  <p class="section-title">🧪 Evaluation Design — 3 Experiments</p>
+  <div class="table-wrap">
+    <table class="exp-table">
+      <thead>
+        <tr>
+          <th>Experiment</th>
+          <th>What You Measure</th>
+          <th>Dataset Used</th>
+          <th>Baseline vs. Your System</th>
+          <th>Tools</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>E-01: Maintainability</td>
+          <td>CBO, LCOM, Cyclomatic Complexity, Lines of Code, Change Impact Score</td>
+          <td>Code metrics (no imaging data)</td>
+          <td>Ad-hoc FL implementation vs. FedPatterns-Med implementation of same system</td>
+          <td>Radon, SonarQube, PyDriller</td>
+        </tr>
+        <tr>
+          <td>E-02: Privacy–Accuracy Trade-off</td>
+          <td>AUC-ROC, F1-Score, Privacy Budget ε, Communication Overhead (MB/round), Round Convergence</td>
+          <td>NIH ChestX-ray14 + MedMNIST PneumoniaMNIST + ISIC 2020</td>
+          <td>5 pattern compositions (DifferentialDecorator ON vs OFF, ε = 0.1 / 1.0 / 10)</td>
+          <td>Flower, Opacus, PyTorch, Weights & Biases</td>
+        </tr>
+        <tr>
+          <td>E-03: Compliance Validation</td>
+          <td>Compliance Score per pattern composition (0–100), Regulation Violation Flags, Mitigation Coverage</td>
+          <td>Pattern catalog + regulation text (no imaging data)</td>
+          <td>Automated rule checker output vs. manual legal audit checklist</td>
+          <td>Custom Python Compliance Validator, GDPR Art.25/32 checklist</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TECH STACK -->
+  <p class="section-title">⚙ Technology Stack</p>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.75rem;margin-bottom:2rem">
+    <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:0.375rem">🌸</div>
+      <div style="font-size:0.8125rem;font-weight:600">Flower (flwr)</div>
+      <div style="font-size:0.6875rem;color:var(--color-text-muted)">FL Framework</div>
+    </div>
+    <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:0.375rem">🔥</div>
+      <div style="font-size:0.8125rem;font-weight:600">PyTorch + Opacus</div>
+      <div style="font-size:0.6875rem;color:var(--color-text-muted)">Training + DP</div>
+    </div>
+    <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:0.375rem">⚡</div>
+      <div style="font-size:0.8125rem;font-weight:600">FastAPI</div>
+      <div style="font-size:0.6875rem;color:var(--color-text-muted)">REST API Server</div>
+    </div>
+    <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:0.375rem">🍃</div>
+      <div style="font-size:0.8125rem;font-weight:600">MongoDB</div>
+      <div style="font-size:0.6875rem;color:var(--color-text-muted)">Pattern Registry</div>
+    </div>
+    <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:0.375rem">🐳</div>
+      <div style="font-size:0.8125rem;font-weight:600">Docker Compose</div>
+      <div style="font-size:0.6875rem;color:var(--color-text-muted)">Multi-client sim</div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div>FedPatterns-Med — Research Architecture Reference · Subhash R · 2026</div>
+  <div class="footer-links">
+    <a href="https://flower.ai" target="_blank" rel="noopener noreferrer">Flower Framework</a>
+    <a href="https://medmnist.com" target="_blank" rel="noopener noreferrer">MedMNIST</a>
+    <a href="https://www.kaggle.com/datasets/nih-chest-xrays/data" target="_blank" rel="noopener noreferrer">NIH ChestX-ray14</a>
+    <a href="https://challenge2020.isic-archive.com" target="_blank" rel="noopener noreferrer">ISIC 2020</a>
+    <a href="https://arxiv.org/abs/2101.02373" target="_blank" rel="noopener noreferrer">Lo et al. 2021</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const btn = document.querySelector('[data-theme-toggle]');
+  const root = document.documentElement;
+  let theme = root.getAttribute('data-theme') || 'dark';
+  function updateBtn(){
+    btn.textContent = theme === 'dark' ? '☀ Light' : '☾ Dark';
+  }
+  updateBtn();
+  btn.addEventListener('click', () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    updateBtn();
+  });
+})();
+</script>
+</body>
+</html>
